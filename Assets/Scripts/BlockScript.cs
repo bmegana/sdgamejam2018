@@ -44,21 +44,27 @@ public class BlockScript : MonoBehaviour
             Destroy(gameObject);
         }
 
+
         if (normal.y >= 0.99f)
         {
-            if (entity.CompareTag("Player"))
+			if (entity.CompareTag("Player"))
             {
                 collided = true;
                 rootObj = entity;
                 rootObjRb2d = rootObj.GetComponent<Rigidbody2D>();
-            }
-            else if (entity.CompareTag(BLOCK_TAG))
+				FixedJoint2D fj2d = this.gameObject.AddComponent<FixedJoint2D>();
+				fj2d.connectedBody = rootObjRb2d;
+
+			}
+			else if (entity.CompareTag(BLOCK_TAG))
             {
                 BlockScript block = entity.GetComponent<BlockScript>();
                 collided = true;
                 rootObj = block.rootObj;
                 rootObjRb2d = block.rootObjRb2d;
-            }
-        }
-    }
+				FixedJoint2D fj2d = this.gameObject.AddComponent<FixedJoint2D>();
+				fj2d.connectedBody = rootObjRb2d;
+			}
+		}
+	}
 }
