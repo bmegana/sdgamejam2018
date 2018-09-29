@@ -12,7 +12,7 @@ public class SpawnObject : MonoBehaviour
 
     private void InstantiateRandomBlock(Vector2 spawnPos)
     {
-        int blockTypeNum = Random.Range(0, 3);
+        int blockTypeNum = Random.Range(0, 4);
         GameObject block = Instantiate(
                 objectPrefab,
                 spawnPos,
@@ -33,6 +33,11 @@ public class SpawnObject : MonoBehaviour
         {
             block.GetComponent<SpriteRenderer>().color = Color.red;
             blockScript.blockType = BlockScript.BlockType.DoctorAppointment;
+        }
+        else if (blockTypeNum == 3)
+        {
+            block.GetComponent<SpriteRenderer>().color = Color.black;
+            blockScript.blockType = BlockScript.BlockType.IllicitDrug;
         }
     }
 

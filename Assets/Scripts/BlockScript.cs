@@ -12,7 +12,8 @@ public class BlockScript : MonoBehaviour
     {
         TaxReturn,
         Beer,
-        DoctorAppointment
+        DoctorAppointment,
+        IllicitDrug
     }
     public BlockType blockType;
 
@@ -59,6 +60,12 @@ public class BlockScript : MonoBehaviour
             StatManager.instance.IncreaseHealth(10.0f);
             StatManager.instance.DecreaseMoney(10.0f);
         }
+        if (blockType == BlockType.IllicitDrug)
+        {
+            StatManager.instance.DecreaseHealth(20.0f);
+            StatManager.instance.DecreaseMoney(20.0f);
+            StatManager.instance.DecreaseMorale(20.0f);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -70,11 +77,10 @@ public class BlockScript : MonoBehaviour
         }
         GameObject entity = collision.collider.gameObject;
 
-        if (entity.CompareTag("BlockDestroy"))
+        if (entity.CompareTag("BlockDestroy") && !collided)
         {
             Destroy(gameObject);
         }
-
 
         if (normal.y >= 0.99f && !collided)
         {
@@ -86,6 +92,11 @@ public class BlockScript : MonoBehaviour
 				FixedJoint2D fj2d = this.gameObject.AddComponent<FixedJoint2D>();
 				fj2d.connectedBody = rootObjRb2d;
                 CheckBlockType();
+
+                if (gameObject.transform.position.y >= HeadControl.instance.highestBlockHeight)
+                {
+                    HeadControl.instance.UpdateHeadPosition(gameObject.transform.position);
+                }
             }
 			else if (entity.CompareTag(BLOCK_TAG))
             {
@@ -96,6 +107,11 @@ public class BlockScript : MonoBehaviour
 				FixedJoint2D fj2d = this.gameObject.AddComponent<FixedJoint2D>();
 				fj2d.connectedBody = rootObjRb2d;
 				CheckBlockType();
+
+                if (gameObject.transform.position.y >= HeadControl.instance.highestBlockHeight)
+                {
+                     HeadControl.instance.UpdateHeadPosition(gameObject.transform.position);
+                }
 			}
 		}
 	}
