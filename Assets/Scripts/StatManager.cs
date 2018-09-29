@@ -6,15 +6,18 @@ public class StatManager : MonoBehaviour
     public static StatManager instance;
 
     public float initHealth;
-    private float currentHealth;
+    public float maxHealth;
+    public float currentHealth;
     public Slider healthSlider;
 
     public float initMoney;
-    private float currentMoney;
+    public float maxMoney;
+    public float currentMoney;
     public Slider moneySlider;
 
     public float initMorale;
-    private float currentMorale;
+    public float maxMorale;
+    public float currentMorale;
     public Slider moraleSlider;
 
     private void Awake()
@@ -32,41 +35,85 @@ public class StatManager : MonoBehaviour
     private void Start()
     {
         currentHealth = initHealth;
+        currentMoney = initMoney;
+        currentMorale = initMorale;
     }
 
     public void IncreaseHealth(float value)
     {
-        currentHealth += value;
-        healthSlider.value = currentHealth / initHealth;
+        if (currentHealth < maxHealth)
+        {
+            currentHealth += value;
+            if (currentHealth >= maxHealth)
+            {
+                currentHealth = maxHealth;
+            }
+        }
+        healthSlider.value = currentHealth / maxHealth;
     }
 
     public void DecreaseHealth(float value)
     {
-        currentHealth -= value;
-        healthSlider.value = currentHealth / initHealth;
+        if (currentHealth > 0.0f)
+        {
+            currentHealth -= value;
+            if (currentHealth <= 0.0f)
+            {
+                currentHealth = 0.0f;
+            }
+        }
+        healthSlider.value = currentHealth / maxHealth;
     }
 
     public void IncreaseMoney(float value)
     {
-        currentMoney += value;
-        moneySlider.value = currentMoney / initMoney;
+        if (currentMoney < maxMoney)
+        {
+            currentMoney += value;
+            if (currentMoney >= maxMoney)
+            {
+                currentMoney = maxMoney;
+            }
+        }
+        moneySlider.value = currentMoney / maxMoney;
     }
 
     public void DecreaseMoney(float value)
     {
-        currentMoney -= value;
-        moneySlider.value = currentMoney / initMoney;
+        if (currentMoney > 0.0f)
+        {
+            currentMoney -= value;
+            if (currentMoney <= 0.0f)
+            {
+                currentMoney = 0.0f;
+            }
+        }
+        moneySlider.value = currentMoney / maxMoney;
     }
 
     public void IncreaseMorale(float value)
     {
-        currentMorale += value;
-        moraleSlider.value = currentMorale / initMorale;
+        if (currentMorale < maxMorale)
+        {
+            currentMorale += value;
+            if (currentMorale >= maxMorale)
+            {
+                currentMorale = maxMorale;
+            }
+        }
+        moraleSlider.value = currentMorale / maxMorale;
     }
 
     public void DecreaseMorale(float value)
     {
-        currentMorale -= value;
-        moraleSlider.value = currentMorale / initMorale;
+        if (currentMorale > 0.0f)
+        {
+            currentMorale -= value;
+            if (currentMorale <= 0.0f)
+            {
+                currentMorale = 0.0f;
+            }
+        }
+        moraleSlider.value = currentMorale / maxMorale;
     }
 }

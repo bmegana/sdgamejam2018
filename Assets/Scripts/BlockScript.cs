@@ -46,15 +46,18 @@ public class BlockScript : MonoBehaviour
     {
         if (blockType == BlockType.Beer)
         {
-            Debug.Log("Increasing Morale, Decreasing Health.");
+            StatManager.instance.IncreaseMorale(10.0f);
+            StatManager.instance.DecreaseHealth(10.0f);
         }
         if (blockType == BlockType.TaxReturn)
         {
-            Debug.Log("Increasing Money, Decreasing Morale.");
+            StatManager.instance.IncreaseMoney(10.0f);
+            StatManager.instance.DecreaseMorale(10.0f);
         }
         if (blockType == BlockType.DoctorAppointment)
         {
-            Debug.Log("Increasing Health, Decreasing Money.");
+            StatManager.instance.IncreaseHealth(10.0f);
+            StatManager.instance.DecreaseMoney(10.0f);
         }
     }
 
@@ -73,7 +76,7 @@ public class BlockScript : MonoBehaviour
         }
 
 
-        if (normal.y >= 0.99f)
+        if (normal.y >= 0.99f && !collided)
         {
 			if (entity.CompareTag("Player"))
             {
@@ -82,8 +85,8 @@ public class BlockScript : MonoBehaviour
                 rootObjRb2d = rootObj.GetComponent<Rigidbody2D>();
 				FixedJoint2D fj2d = this.gameObject.AddComponent<FixedJoint2D>();
 				fj2d.connectedBody = rootObjRb2d;
-
-			}
+                CheckBlockType();
+            }
 			else if (entity.CompareTag(BLOCK_TAG))
             {
                 BlockScript block = entity.GetComponent<BlockScript>();
