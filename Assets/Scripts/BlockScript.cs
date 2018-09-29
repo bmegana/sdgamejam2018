@@ -8,6 +8,14 @@ public class BlockScript : MonoBehaviour
 
     public float fallSpeed;
 
+    public enum BlockType
+    {
+        TaxReturn,
+        Beer,
+        DoctorAppointment
+    }
+    public BlockType blockType;
+
     private Rigidbody2D rb2d;
     private bool collided = false;
 
@@ -34,9 +42,29 @@ public class BlockScript : MonoBehaviour
         }
     }
 
+    private void CheckBlockType()
+    {
+        if (blockType == BlockType.Beer)
+        {
+            Debug.Log("Increasing Morale, Decreasing Health.");
+        }
+        if (blockType == BlockType.TaxReturn)
+        {
+            Debug.Log("Increasing Money, Decreasing Morale.");
+        }
+        if (blockType == BlockType.DoctorAppointment)
+        {
+            Debug.Log("Increasing Health, Decreasing Money.");
+        }
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Vector2 normal = collision.contacts[0].normal;
+        Vector2 normal = Vector2.zero;
+        if (collision.contacts.Length > 0)
+        {
+            normal = collision.contacts[0].normal;
+        }
         GameObject entity = collision.collider.gameObject;
 
         if (entity.CompareTag("BlockDestroy"))
@@ -58,6 +86,8 @@ public class BlockScript : MonoBehaviour
                 collided = true;
                 rootObj = block.rootObj;
                 rootObjRb2d = block.rootObjRb2d;
+
+                CheckBlockType();
             }
         }
     }
