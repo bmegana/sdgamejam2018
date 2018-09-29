@@ -4,25 +4,19 @@ using UnityEngine;
 
 public class BlockScript : MonoBehaviour
 {
+    private readonly string BLOCK_TAG = "Block";
+
     public float fallSpeed;
 
     private Rigidbody2D rb2d;
     private bool collided = false;
 
-    private Transform parentObjTransform;
-    private Rigidbody2D parentObjRb2d;
+    private GameObject rootObj;
+    private Rigidbody2D rootObjRb2d;
 
     private void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
-    }
-
-    private GameObject GetRootParent(GameObject)
-    {
-        if (transform.parent != null)
-        {
-            return GetRootParent();
-        }
     }
 
     private void FixedUpdate()
@@ -33,30 +27,38 @@ public class BlockScript : MonoBehaviour
         }
         else
         {
-            rb2d.velocity = new Vector2(parentObjRb2d.velocity.x, rb2d.velocity.y);
+            if (rootObjRb2d != null)
+            {
+                rb2d.velocity = new Vector2(rootObjRb2d.velocity.x, rb2d.velocity.y);
+            }
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        Vector2 normal = collision.contacts[0].normal;
         GameObject entity = collision.collider.gameObject;
-        if (entity.CompareTag("Player"))
+
+        if (entity.CompareTag("BlockDestroy"))
         {
-            collided = true;
-            transform.parent = entity.transform;
-
-            parentObjTransform = entity.transform;
-            parentObjRb2d = entity.GetComponent<Rigidbody2D>();
-            gameObject.tag = "Player";
+            Destroy(gameObject);
         }
-    }
 
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        collided = false;
-        transform.parent = null;
-
-        parentObjTransform = null;
-        parentObjRb2d = null;
+        if (normal.y >= 0.99f)
+        {
+            if (entity.CompareTag("Player"))
+            {
+                collided = true;
+                rootObj = entity;
+                rootObjRb2d = rootObj.GetComponent<Rigidbody2D>();
+            }
+            else if (entity.CompareTag(BLOCK_TAG))
+            {
+                BlockScript block = entity.GetComponent<BlockScript>();
+                collided = true;
+                rootObj = block.rootObj;
+                rootObjRb2d = block.rootObjRb2d;
+            }
+        }
     }
 }

@@ -1,0 +1,9 @@
+Must Have:
+Blocks must stack
+Blocks must move relative to player
+must have goal line
+scaling camera???
+color coded blocks
+stat management
+
+Cool to Have:
