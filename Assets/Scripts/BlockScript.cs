@@ -58,7 +58,7 @@ public class BlockScript : MonoBehaviour
 				break;
 			case BlockType.DoctorAppointment:
 				stats.IncreaseHealth(10.0f);
-				stats.DecreaseMorale(10.0f);
+				stats.DecreaseMoney(10.0f);
 				break;
 			case BlockType.IllicitDrug:
 				stats.DecreaseHealth(20.0f);
@@ -116,4 +116,12 @@ public class BlockScript : MonoBehaviour
 		}
 		return false;
 	}
+
+    private void OnBecameInvisible()
+    {
+        if (!collided)
+        {
+            Destroy(gameObject);
+        }
+    }
 }
