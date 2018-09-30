@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class StatManager : MonoBehaviour
 {
@@ -20,6 +21,9 @@ public class StatManager : MonoBehaviour
     public float currentMorale;
     public Slider moraleSlider;
 
+    public Text gameOverText;
+    private bool gameOver = false;
+
     private void Awake()
     {
         if (instance == null)
@@ -30,6 +34,7 @@ public class StatManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+        gameOverText.enabled = false;
     }
 
     private void Start()
@@ -37,6 +42,13 @@ public class StatManager : MonoBehaviour
         currentHealth = initHealth;
         currentMoney = initMoney;
         currentMorale = initMorale;
+    }
+
+    private void GameOver()
+    {
+        Time.timeScale = 0;
+        gameOverText.enabled = true;
+        gameOver = true;
     }
 
     public void IncreaseHealth(float value)
@@ -59,7 +71,7 @@ public class StatManager : MonoBehaviour
             currentHealth -= value;
             if (currentHealth <= 0.0f)
             {
-                currentHealth = 0.0f;
+                GameOver();
             }
         }
         healthSlider.value = currentHealth / maxHealth;
@@ -85,7 +97,7 @@ public class StatManager : MonoBehaviour
             currentMoney -= value;
             if (currentMoney <= 0.0f)
             {
-                currentMoney = 0.0f;
+                GameOver();
             }
         }
         moneySlider.value = currentMoney / maxMoney;
@@ -111,9 +123,18 @@ public class StatManager : MonoBehaviour
             currentMorale -= value;
             if (currentMorale <= 0.0f)
             {
-                currentMorale = 0.0f;
+                GameOver();
             }
         }
         moraleSlider.value = currentMorale / maxMorale;
+    }
+
+    private void Update()
+    {
+        if (gameOver && Input.GetKeyDown(KeyCode.R))
+        {
+            Time.timeScale = 1;
+            SceneManager.LoadScene("Game");
+        }
     }
 }
