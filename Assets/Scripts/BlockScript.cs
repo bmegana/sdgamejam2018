@@ -86,7 +86,7 @@ public class BlockScript : MonoBehaviour
             Vector2 newHeadPosition = new Vector2(
                 gameObject.transform.position.x,
                 gameObject.transform.position.y +
-                    ((gameObject.transform.localScale.y / 2.0f) + 0.5f)
+                    ((boxCol2d.size.y / 2.0f) + 0.5f)
             );
             HeadControl.instance.UpdateHeadPosition(newHeadPosition);
             return true;

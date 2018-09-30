@@ -7,37 +7,51 @@ public class SpawnObject : MonoBehaviour
     private float intervalTime = 0.0f;
     public Timer timer;
 
-    public GameObject objectPrefab;
+    public GameObject prescriptionsPrefab;
+    public GameObject taxReturnPrefab;
+    public GameObject beerPrefab;
 
     private void InstantiateRandomBlock(Vector2 spawnPos)
     {
         int blockTypeNum = Random.Range(0, 4);
-        GameObject block = Instantiate(
-                objectPrefab,
-                spawnPos,
-                new Quaternion()
-        );
-        BlockScript blockScript = block.GetComponent<BlockScript>();
         if (blockTypeNum == 0)
         {
-            block.transform.localScale = new Vector3(3, 1, 1);
-            block.GetComponent<SpriteRenderer>().color = Color.yellow;
+            GameObject block = Instantiate(
+                beerPrefab,
+                spawnPos,
+                new Quaternion()
+            );
+            BlockScript blockScript = block.GetComponent<BlockScript>();
             blockScript.blockType = BlockScript.BlockType.Beer;
         }
         else if (blockTypeNum == 1)
         {
-            block.transform.localScale = new Vector3(1, 3, 1);
-            block.GetComponent<SpriteRenderer>().color = Color.green;
+            GameObject block = Instantiate(
+                taxReturnPrefab,
+                spawnPos,
+                new Quaternion()
+            );
+            BlockScript blockScript = block.GetComponent<BlockScript>();
             blockScript.blockType = BlockScript.BlockType.TaxReturn;
         }
         else if (blockTypeNum == 2)
         {
-            block.transform.localScale = new Vector3(2, 2, 1);
-            block.GetComponent<SpriteRenderer>().color = Color.red;
+            GameObject block = Instantiate(
+                prescriptionsPrefab,
+                spawnPos,
+                new Quaternion()
+            );
+            BlockScript blockScript = block.GetComponent<BlockScript>();
             blockScript.blockType = BlockScript.BlockType.DoctorAppointment;
         }
         else if (blockTypeNum == 3)
         {
+            GameObject block = Instantiate(
+                prescriptionsPrefab,
+                spawnPos,
+                new Quaternion()
+            );
+            BlockScript blockScript = block.GetComponent<BlockScript>();
             int badType = Random.Range(0, 2);
             if (badType == 1)
             {
@@ -59,16 +73,19 @@ public class SpawnObject : MonoBehaviour
 
     private void Update()
     {
-        intervalTime += intervalTimeIncrement;
-        if (intervalTime >= spawnInterval)
+        if (Time.timeScale > 0)
         {
-            float spawnRangeScale = gameObject.transform.localScale.x / 2.0f;
-            Vector2 spawnPos = new Vector2(
-                Random.Range(-spawnRangeScale, spawnRangeScale),
-                gameObject.transform.position.y
-            );
-            InstantiateRandomBlock(spawnPos);
-            intervalTime = 0.0f;
+            intervalTime += intervalTimeIncrement;
+            if (intervalTime >= spawnInterval)
+            {
+                float spawnRangeScale = gameObject.transform.localScale.x / 2.0f;
+                Vector2 spawnPos = new Vector2(
+                    Random.Range(-spawnRangeScale, spawnRangeScale),
+                    gameObject.transform.position.y
+                );
+                InstantiateRandomBlock(spawnPos);
+                intervalTime = 0.0f;
+            }
         }
     }
 }
