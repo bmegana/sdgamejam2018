@@ -6,6 +6,13 @@ public class StatManager : MonoBehaviour
 {
     public static StatManager instance;
 
+	private enum Stat
+	{
+		Health,
+		Money,
+		Morale
+	}
+
     public float initHealth;
     public float maxHealth;
     public float currentHealth;
@@ -23,6 +30,7 @@ public class StatManager : MonoBehaviour
 
     public Text gameOverText;
     private bool gameOver = false;
+	public float statDecrement = 1;
 
     private void Awake()
     {
@@ -37,7 +45,25 @@ public class StatManager : MonoBehaviour
         gameOverText.enabled = false;
     }
 
-    private void Start()
+	private void Update()
+	{
+		float val = statDecrement * Time.deltaTime;
+		currentHealth -= val;
+		currentMoney -= val;
+		currentMorale -= val;
+		UpdateSlider(Stat.Health);
+		UpdateSlider(Stat.Money);
+		UpdateSlider(Stat.Morale);
+
+		if (gameOver && Input.GetKeyDown(KeyCode.R))
+		{
+			Time.timeScale = 1;
+			SceneManager.LoadScene("Game");
+		}
+
+	}
+
+	private void Start()
     {
         currentHealth = initHealth;
         currentMoney = initMoney;
@@ -51,7 +77,23 @@ public class StatManager : MonoBehaviour
         gameOver = true;
     }
 
-    public void IncreaseHealth(float value)
+	private void UpdateSlider(Stat stat)
+	{
+		switch (stat)
+		{
+			case Stat.Health:
+				healthSlider.value = currentHealth / maxHealth;
+				break;
+			case Stat.Money:
+				moneySlider.value = currentMoney / maxMoney;
+				break;
+			case Stat.Morale:
+				moraleSlider.value = currentMorale / maxMorale;
+				break;
+		}
+	}
+
+	public void IncreaseHealth(float value)
     {
         if (currentHealth < maxHealth)
         {
@@ -61,7 +103,7 @@ public class StatManager : MonoBehaviour
                 currentHealth = maxHealth;
             }
         }
-        healthSlider.value = currentHealth / maxHealth;
+		UpdateSlider(Stat.Health);
     }
 
     public void DecreaseHealth(float value)
@@ -74,10 +116,10 @@ public class StatManager : MonoBehaviour
                 GameOver();
             }
         }
-        healthSlider.value = currentHealth / maxHealth;
-    }
+		UpdateSlider(Stat.Health);
+	}
 
-    public void IncreaseMoney(float value)
+	public void IncreaseMoney(float value)
     {
         if (currentMoney < maxMoney)
         {
@@ -87,10 +129,10 @@ public class StatManager : MonoBehaviour
                 currentMoney = maxMoney;
             }
         }
-        moneySlider.value = currentMoney / maxMoney;
-    }
+		UpdateSlider(Stat.Money);
+	}
 
-    public void DecreaseMoney(float value)
+	public void DecreaseMoney(float value)
     {
         if (currentMoney > 0.0f)
         {
@@ -100,10 +142,10 @@ public class StatManager : MonoBehaviour
                 GameOver();
             }
         }
-        moneySlider.value = currentMoney / maxMoney;
-    }
+		UpdateSlider(Stat.Money);
+	}
 
-    public void IncreaseMorale(float value)
+	public void IncreaseMorale(float value)
     {
         if (currentMorale < maxMorale)
         {
@@ -113,10 +155,10 @@ public class StatManager : MonoBehaviour
                 currentMorale = maxMorale;
             }
         }
-        moraleSlider.value = currentMorale / maxMorale;
-    }
+		UpdateSlider(Stat.Morale);
+	}
 
-    public void DecreaseMorale(float value)
+	public void DecreaseMorale(float value)
     {
         if (currentMorale > 0.0f)
         {
@@ -126,15 +168,6 @@ public class StatManager : MonoBehaviour
                 GameOver();
             }
         }
-        moraleSlider.value = currentMorale / maxMorale;
-    }
-
-    private void Update()
-    {
-        if (gameOver && Input.GetKeyDown(KeyCode.R))
-        {
-            Time.timeScale = 1;
-            SceneManager.LoadScene("Game");
-        }
-    }
+		UpdateSlider(Stat.Morale);
+	}
 }
