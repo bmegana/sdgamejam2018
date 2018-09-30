@@ -128,7 +128,7 @@ public class StatManager : MonoBehaviour
         float percentBeer =
             (beersDrank / totalAdultThingsDone) * 100.0f;
         adultStats.text =
-            "Your body is made of:\n" +
+            "Your life is made of:\n" +
             percentDoctors.ToString("F1") +
             "% Medications\n" +
             percentTaxes.ToString("F1") +
