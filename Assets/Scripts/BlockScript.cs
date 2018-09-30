@@ -45,74 +45,75 @@ public class BlockScript : MonoBehaviour
 
     private void CheckBlockType()
     {
-        if (blockType == BlockType.Beer)
-        {
-            StatManager.instance.IncreaseMorale(10.0f);
-            StatManager.instance.DecreaseHealth(10.0f);
-        }
-        if (blockType == BlockType.TaxReturn)
-        {
-            StatManager.instance.IncreaseMoney(10.0f);
-            StatManager.instance.DecreaseMorale(10.0f);
-        }
-        if (blockType == BlockType.DoctorAppointment)
-        {
-            StatManager.instance.IncreaseHealth(10.0f);
-            StatManager.instance.DecreaseMoney(10.0f);
-        }
-        if (blockType == BlockType.IllicitDrug)
-        {
-            StatManager.instance.DecreaseHealth(20.0f);
-            StatManager.instance.DecreaseMoney(20.0f);
-            StatManager.instance.DecreaseMorale(20.0f);
-        }
+		StatManager stats = StatManager.instance;
+		switch(blockType)
+		{
+			case BlockType.Beer:
+				stats.IncreaseMorale(10.0f);
+				stats.DecreaseHealth(10.0f);
+				break;
+			case BlockType.TaxReturn:
+				stats.IncreaseMoney(10.0f);
+				stats.DecreaseMorale(10.0f);
+				break;
+			case BlockType.DoctorAppointment:
+				stats.IncreaseHealth(10.0f);
+				stats.DecreaseMorale(10.0f);
+				break;
+			case BlockType.IllicitDrug:
+				stats.DecreaseHealth(20.0f);
+				stats.DecreaseMoney(20.0f);
+				stats.DecreaseMorale(20.0f);
+				break;
+		}
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Vector2 normal = Vector2.zero;
+		GameObject entity = collision.collider.gameObject;
+		Vector2 normal = Vector2.zero;
         if (collision.contacts.Length > 0)
         {
             normal = collision.contacts[0].normal;
         }
-        GameObject entity = collision.collider.gameObject;
 
         if (entity.CompareTag("BlockDestroy") && !collided)
         {
             Destroy(gameObject);
         }
-
-        if (normal.y >= 0.99f && !collided)
+		else if (normal.y >= 0.99f && !collided)
         {
 			if (entity.CompareTag("Player"))
             {
-                collided = true;
                 rootObj = entity;
                 rootObjRb2d = rootObj.GetComponent<Rigidbody2D>();
-				FixedJoint2D fj2d = this.gameObject.AddComponent<FixedJoint2D>();
-				fj2d.connectedBody = rootObjRb2d;
-                CheckBlockType();
-
-                if (gameObject.transform.position.y >= HeadControl.instance.highestBlockHeight)
-                {
-                    HeadControl.instance.UpdateHeadPosition(gameObject.transform.position);
-                }
             }
 			else if (entity.CompareTag(BLOCK_TAG))
             {
                 BlockScript block = entity.GetComponent<BlockScript>();
-                collided = true;
                 rootObj = block.rootObj;
                 rootObjRb2d = block.rootObjRb2d;
-				FixedJoint2D fj2d = this.gameObject.AddComponent<FixedJoint2D>();
-				fj2d.connectedBody = rootObjRb2d;
-				CheckBlockType();
-
-                if (gameObject.transform.position.y >= HeadControl.instance.highestBlockHeight)
-                {
-                     HeadControl.instance.UpdateHeadPosition(gameObject.transform.position);
-                }
 			}
+			collided = true;
+			CheckBlockType();
+			AttachBlock(rootObjRb2d);
+			UpdateHeadCheck();
 		}
+	}
+
+	public void AttachBlock(Rigidbody2D attached)
+	{
+		FixedJoint2D fj2d = this.gameObject.AddComponent<FixedJoint2D>();
+		fj2d.connectedBody = attached;
+	}
+	
+	public bool UpdateHeadCheck()
+	{
+		if (gameObject.transform.position.y >= HeadControl.instance.highestBlockHeight)
+		{
+			HeadControl.instance.UpdateHeadPosition(gameObject.transform.position);
+			return true;
+		}
+		return false;
 	}
 }
