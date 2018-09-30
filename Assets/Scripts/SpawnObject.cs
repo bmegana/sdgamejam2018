@@ -1,13 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SpawnObject : MonoBehaviour
 {
     public float spawnInterval;
     public float intervalTimeIncrement;
     private float intervalTime = 0.0f;
-	public Timer timer;
+    public Timer timer;
 
     public GameObject objectPrefab;
 
@@ -47,7 +45,15 @@ public class SpawnObject : MonoBehaviour
             }
             block.GetComponent<SpriteRenderer>().color = Color.black;
             blockScript.blockType = BlockScript.BlockType.IllicitDrug;
-			blockScript.fallSpeed = 5 + (int)(timer.time / 5);
+            int fallIncrease = (int)(timer.time / 10);
+            if (fallIncrease <= 17.5f)
+            {
+                blockScript.fallSpeed += fallIncrease;
+            }
+            else
+            {
+                blockScript.fallSpeed += 17.5f;
+            }
         }
     }
 
@@ -63,6 +69,6 @@ public class SpawnObject : MonoBehaviour
             );
             InstantiateRandomBlock(spawnPos);
             intervalTime = 0.0f;
-        }        
+        }
     }
 }

@@ -1,10 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BlockScript : MonoBehaviour
 {
+    private readonly string PLAYER_TAG = "Player";
     private readonly string BLOCK_TAG = "Block";
+    private readonly string BLOCK_DESTROY_TAG = "BlockDestroy";
 
     public float fallSpeed;
 
@@ -18,7 +18,8 @@ public class BlockScript : MonoBehaviour
     public BlockType blockType;
 
     private Rigidbody2D rb2d;
-    private bool collided = false;
+    private BoxCollider2D boxCol2d;
+    private bool stacked = false;
 
     private GameObject rootObj;
     private Rigidbody2D rootObjRb2d;
@@ -26,11 +27,12 @@ public class BlockScript : MonoBehaviour
     private void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
+        boxCol2d = GetComponent<BoxCollider2D>();
     }
 
     private void FixedUpdate()
     {
-        if (!collided)
+        if (!stacked)
         {
             rb2d.velocity = new Vector2(0.0f, -fallSpeed);
         }
@@ -45,83 +47,114 @@ public class BlockScript : MonoBehaviour
 
     private void CheckBlockType()
     {
-		StatManager stats = StatManager.instance;
-		switch(blockType)
-		{
-			case BlockType.Beer:
-				stats.IncreaseMorale(10.0f);
-				stats.DecreaseHealth(10.0f);
-				break;
-			case BlockType.TaxReturn:
-				stats.IncreaseMoney(10.0f);
-				stats.DecreaseMorale(10.0f);
-				break;
-			case BlockType.DoctorAppointment:
-				stats.IncreaseHealth(10.0f);
-				stats.DecreaseMoney(10.0f);
-				break;
-			case BlockType.IllicitDrug:
-				stats.DecreaseHealth(20.0f);
-				stats.DecreaseMoney(20.0f);
-				stats.DecreaseMorale(20.0f);
-				break;
-		}
+        StatManager stats = StatManager.instance;
+        switch (blockType)
+        {
+            case BlockType.Beer:
+                stats.IncreaseMorale(20.0f);
+                stats.DecreaseHealth(10.0f);
+                stats.UpdateCounts(BlockType.Beer);
+                break;
+            case BlockType.TaxReturn:
+                stats.IncreaseMoney(20.0f);
+                stats.DecreaseMorale(10.0f);
+                stats.UpdateCounts(BlockType.TaxReturn);
+                break;
+            case BlockType.DoctorAppointment:
+                stats.IncreaseHealth(20.0f);
+                stats.DecreaseMoney(10.0f);
+                stats.UpdateCounts(BlockType.DoctorAppointment);
+                break;
+            case BlockType.IllicitDrug:
+                stats.DecreaseHealth(15.0f);
+                stats.DecreaseMoney(15.0f);
+                stats.DecreaseMorale(15.0f);
+                break;
+        }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    public void AttachBlock(Rigidbody2D attached)
     {
-		GameObject entity = collision.collider.gameObject;
-		Vector2 normal = Vector2.zero;
+        FixedJoint2D fj2d = this.gameObject.AddComponent<FixedJoint2D>();
+        fj2d.connectedBody = attached;
+    }
+
+    public bool UpdateHeadCheck()
+    {
+        if (gameObject.transform.position.y >= HeadControl.instance.highestBlockHeight)
+        {
+            Vector2 newHeadPosition = new Vector2(
+                gameObject.transform.position.x,
+                gameObject.transform.position.y +
+                    ((gameObject.transform.localScale.y / 2.0f) + 0.5f)
+            );
+            HeadControl.instance.UpdateHeadPosition(newHeadPosition);
+            return true;
+        }
+        return false;
+    }
+
+    private void CheckStacking(Collision2D collision)
+    {
+        GameObject entity = collision.collider.gameObject;
+        Vector2 normal = Vector2.zero;
         if (collision.contacts.Length > 0)
         {
             normal = collision.contacts[0].normal;
         }
 
-        if (entity.CompareTag("BlockDestroy") && !collided)
+        if (entity.CompareTag(BLOCK_DESTROY_TAG) && !stacked)
         {
             Destroy(gameObject);
         }
-		else if (normal.y >= 0.99f && !collided)
+        else if (normal.y >= 0.9f && !stacked)
         {
-			if (entity.CompareTag("Player"))
+            if (entity.CompareTag(PLAYER_TAG))
             {
                 rootObj = entity;
                 rootObjRb2d = rootObj.GetComponent<Rigidbody2D>();
+                stacked = true;
+
+                CheckBlockType();
+                AttachBlock(rootObjRb2d);
+                UpdateHeadCheck();
             }
-			else if (entity.CompareTag(BLOCK_TAG))
+            else if (entity.CompareTag(BLOCK_TAG))
             {
                 BlockScript block = entity.GetComponent<BlockScript>();
-                rootObj = block.rootObj;
-                rootObjRb2d = block.rootObjRb2d;
-			}
-			collided = true;
-			CheckBlockType();
-			AttachBlock(rootObjRb2d);
-			UpdateHeadCheck();
-		}
-	}
+                if (block.stacked)
+                {
+                    rootObj = block.rootObj;
+                    rootObjRb2d = block.rootObjRb2d;
+                    stacked = true;
 
-	public void AttachBlock(Rigidbody2D attached)
-	{
-		FixedJoint2D fj2d = this.gameObject.AddComponent<FixedJoint2D>();
-		fj2d.connectedBody = attached;
-	}
-	
-	public bool UpdateHeadCheck()
-	{
-		if (gameObject.transform.position.y >= HeadControl.instance.highestBlockHeight)
-		{
-			HeadControl.instance.UpdateHeadPosition(gameObject.transform.position);
-			return true;
-		}
-		return false;
-	}
+                    CheckBlockType();
+                    AttachBlock(rootObjRb2d);
+                    UpdateHeadCheck();
+                }
+            }
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        CheckStacking(collision);
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        CheckStacking(collision);
+    }
 
     private void OnBecameInvisible()
     {
-        if (!collided)
+        if (!stacked)
         {
             Destroy(gameObject);
+        }
+        else
+        {
+            boxCol2d.enabled = false;
         }
     }
 }

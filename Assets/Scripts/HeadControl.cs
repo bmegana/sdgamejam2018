@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class HeadControl : MonoBehaviour {
 
@@ -23,7 +21,7 @@ public class HeadControl : MonoBehaviour {
 
     public void UpdateHeadPosition(Vector2 newPos)
     {
-        head.transform.position = newPos + Vector2.up;
+        head.transform.position = newPos;
         highestBlockHeight = newPos.y;
     }
 }

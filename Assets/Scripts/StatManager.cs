@@ -28,8 +28,14 @@ public class StatManager : MonoBehaviour
     public float currentMorale;
     public Slider moraleSlider;
 
+    public Text adultStats;
+    public int totalAdultThingsDone = 0;
+    public float doctorAppointmentsMade = 0;
+    public float taxReturnFormsFilled = 0;
+    public float beersDrank = 0;
+
     public Text gameOverText;
-    private bool gameOver = false;
+    public bool gameOver = false;
 	public float statDecrement = 1;
 
     private void Awake()
@@ -45,7 +51,20 @@ public class StatManager : MonoBehaviour
         gameOverText.enabled = false;
     }
 
-	private void Update()
+    private void Start()
+    {
+        currentHealth = initHealth;
+        currentMoney = initMoney;
+        currentMorale = initMorale;
+
+        adultStats.text =
+            "Your body is made of:\n" +
+            "0% Medications\n" +
+            "0% Tax Returns\n" +
+            "0% Beer";
+    }
+
+    private void Update()
 	{
 		float val = statDecrement * Time.deltaTime;
 		currentHealth -= val;
@@ -62,13 +81,6 @@ public class StatManager : MonoBehaviour
 		}
 
 	}
-
-	private void Start()
-    {
-        currentHealth = initHealth;
-        currentMoney = initMoney;
-        currentMorale = initMorale;
-    }
 
     private void GameOver()
     {
@@ -92,6 +104,38 @@ public class StatManager : MonoBehaviour
 				break;
 		}
 	}
+
+    public void UpdateCounts(BlockScript.BlockType blockType)
+    {
+        switch (blockType)
+        {
+            case BlockScript.BlockType.DoctorAppointment:
+                doctorAppointmentsMade++;
+                break;
+            case BlockScript.BlockType.TaxReturn:
+                taxReturnFormsFilled++;
+                break;
+            case BlockScript.BlockType.Beer:
+                beersDrank++;
+                break;
+        }
+        totalAdultThingsDone++;
+
+        float percentDoctors =
+            (doctorAppointmentsMade / totalAdultThingsDone) * 100.0f;
+        float percentTaxes =
+            (taxReturnFormsFilled / totalAdultThingsDone) * 100.0f;
+        float percentBeer =
+            (beersDrank / totalAdultThingsDone) * 100.0f;
+        adultStats.text =
+            "Your body is made of:\n" +
+            percentDoctors.ToString("F1") +
+            "% Medications\n" +
+            percentTaxes.ToString("F1") +
+            "% Tax Returns\n" +
+            percentBeer.ToString("F1") +
+            "% Beer\n";
+    }
 
 	public void IncreaseHealth(float value)
     {
