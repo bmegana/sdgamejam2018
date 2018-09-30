@@ -24,5 +24,6 @@ public class HeadControl : MonoBehaviour {
     public void UpdateHeadPosition(Vector2 newPos)
     {
         head.transform.position = newPos + Vector2.up;
+        highestBlockHeight = newPos.y;
     }
 }
