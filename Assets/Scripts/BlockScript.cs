@@ -12,8 +12,9 @@ public class BlockScript : MonoBehaviour
     {
         TaxReturn,
         Beer,
-        DoctorAppointment,
-        IllicitDrug
+        Prescriptions,
+        IllicitDrug,
+        SuddenDeath
     }
     public BlockType blockType;
 
@@ -60,12 +61,17 @@ public class BlockScript : MonoBehaviour
                 stats.DecreaseMorale(10.0f);
                 stats.UpdateCounts(BlockType.TaxReturn);
                 break;
-            case BlockType.DoctorAppointment:
+            case BlockType.Prescriptions:
                 stats.IncreaseHealth(20.0f);
                 stats.DecreaseMoney(10.0f);
-                stats.UpdateCounts(BlockType.DoctorAppointment);
+                stats.UpdateCounts(BlockType.Prescriptions);
                 break;
             case BlockType.IllicitDrug:
+                stats.DecreaseHealth(15.0f);
+                stats.DecreaseMoney(15.0f);
+                stats.DecreaseMorale(15.0f);
+                break;
+            case BlockType.SuddenDeath:
                 stats.DecreaseHealth(15.0f);
                 stats.DecreaseMoney(15.0f);
                 stats.DecreaseMorale(15.0f);
@@ -81,7 +87,7 @@ public class BlockScript : MonoBehaviour
 
     public bool UpdateHeadCheck()
     {
-        if (gameObject.transform.position.y >= HeadControl.instance.highestBlockHeight)
+        if (gameObject.transform.position.y + 1 >= HeadControl.instance.highestBlockHeight)
         {
             Vector2 newHeadPosition = new Vector2(
                 gameObject.transform.position.x,

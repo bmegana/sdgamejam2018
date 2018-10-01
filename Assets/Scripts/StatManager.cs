@@ -34,9 +34,7 @@ public class StatManager : MonoBehaviour
     public float taxReturnFormsFilled = 0;
     public float beersDrank = 0;
 
-    public Text gameOverText;
-    public bool gameOver = false;
-	public float statDecrement = 1;
+    public float statDecrement = 1;
 
     private void Awake()
     {
@@ -48,7 +46,6 @@ public class StatManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-        gameOverText.enabled = false;
     }
 
     private void Start()
@@ -64,7 +61,7 @@ public class StatManager : MonoBehaviour
             "0% Beer";
     }
 
-    private void Update()
+    private void FixedUpdate()
 	{
 		float val = statDecrement * Time.deltaTime;
 		currentHealth -= val;
@@ -73,21 +70,7 @@ public class StatManager : MonoBehaviour
 		UpdateSlider(Stat.Health);
 		UpdateSlider(Stat.Money);
 		UpdateSlider(Stat.Morale);
-
-		if (gameOver && Input.GetKeyDown(KeyCode.R))
-		{
-			Time.timeScale = 1;
-			SceneManager.LoadScene("Game");
-		}
-
 	}
-
-    private void GameOver()
-    {
-        Time.timeScale = 0;
-        gameOverText.enabled = true;
-        gameOver = true;
-    }
 
 	private void UpdateSlider(Stat stat)
 	{
@@ -109,7 +92,7 @@ public class StatManager : MonoBehaviour
     {
         switch (blockType)
         {
-            case BlockScript.BlockType.DoctorAppointment:
+            case BlockScript.BlockType.Prescriptions:
                 doctorAppointmentsMade++;
                 break;
             case BlockScript.BlockType.TaxReturn:
@@ -129,11 +112,11 @@ public class StatManager : MonoBehaviour
             (beersDrank / totalAdultThingsDone) * 100.0f;
         adultStats.text =
             "Your life is made of:\n" +
-            percentDoctors.ToString("F1") +
+            percentDoctors.ToString("0") +
             "% Medications\n" +
-            percentTaxes.ToString("F1") +
+            percentTaxes.ToString("0") +
             "% Tax Returns\n" +
-            percentBeer.ToString("F1") +
+            percentBeer.ToString("0") +
             "% Beer\n";
     }
 
@@ -157,7 +140,7 @@ public class StatManager : MonoBehaviour
             currentHealth -= value;
             if (currentHealth <= 0.0f)
             {
-                GameOver();
+                GameControl.instance.GameOver();
             }
         }
 		UpdateSlider(Stat.Health);
@@ -183,7 +166,7 @@ public class StatManager : MonoBehaviour
             currentMoney -= value;
             if (currentMoney <= 0.0f)
             {
-                GameOver();
+                GameControl.instance.GameOver();
             }
         }
 		UpdateSlider(Stat.Money);
@@ -209,7 +192,7 @@ public class StatManager : MonoBehaviour
             currentMorale -= value;
             if (currentMorale <= 0.0f)
             {
-                GameOver();
+                GameControl.instance.GameOver();
             }
         }
 		UpdateSlider(Stat.Morale);

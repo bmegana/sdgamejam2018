@@ -41,7 +41,7 @@ public class MoveGameUp : MonoBehaviour
          * Code below should be within this function because Update is not
          * dependent on time, unlike FixedUpdate.
          */
-        if (StatManager.instance.gameOver &&
+        if (GameControl.instance.gameIsOver &&
             cameraObj.transform.position.y != initCamPos.y)
         {
             float moveDownDec = 0.0001f;

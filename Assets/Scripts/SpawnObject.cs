@@ -10,10 +10,12 @@ public class SpawnObject : MonoBehaviour
     public GameObject prescriptionsPrefab;
     public GameObject taxReturnPrefab;
     public GameObject beerPrefab;
+    public GameObject illicitDrugPrefab;
+    public GameObject suddenDeathPrefab;
 
     private void InstantiateRandomBlock(Vector2 spawnPos)
     {
-        int blockTypeNum = Random.Range(0, 4);
+        int blockTypeNum = Random.Range(0, 5);
         if (blockTypeNum == 0)
         {
             GameObject block = Instantiate(
@@ -42,22 +44,35 @@ public class SpawnObject : MonoBehaviour
                 new Quaternion()
             );
             BlockScript blockScript = block.GetComponent<BlockScript>();
-            blockScript.blockType = BlockScript.BlockType.DoctorAppointment;
+            blockScript.blockType = BlockScript.BlockType.Prescriptions;
         }
         else if (blockTypeNum == 3)
         {
             GameObject block = Instantiate(
-                prescriptionsPrefab,
+                illicitDrugPrefab,
                 spawnPos,
                 new Quaternion()
             );
             BlockScript blockScript = block.GetComponent<BlockScript>();
-            int badType = Random.Range(0, 2);
-            if (badType == 1)
+            blockScript.blockType = BlockScript.BlockType.IllicitDrug;
+            int fallIncrease = (int)(timer.time / 10);
+            if (fallIncrease <= 17.5f)
             {
-                block.transform.localScale = new Vector3(3, 3, 1);
+                blockScript.fallSpeed += fallIncrease;
             }
-            block.GetComponent<SpriteRenderer>().color = Color.black;
+            else
+            {
+                blockScript.fallSpeed += 17.5f;
+            }
+        }
+        else if (blockTypeNum == 4)
+        {
+            GameObject block = Instantiate(
+                suddenDeathPrefab,
+                spawnPos,
+                new Quaternion()
+            );
+            BlockScript blockScript = block.GetComponent<BlockScript>();
             blockScript.blockType = BlockScript.BlockType.IllicitDrug;
             int fallIncrease = (int)(timer.time / 10);
             if (fallIncrease <= 17.5f)
